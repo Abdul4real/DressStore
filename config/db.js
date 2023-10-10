@@ -12,6 +12,9 @@ module.exports = function(){
 
     mongodb.on('error', console.error.bind(console, 'Connection Error: '));
     mongodb.once('open', ()=>{
+        console.log("====> Hi User");
+        console.log("====> Connecting to MongoDB.");
+        console.log("====> :) <====");
         console.log("====> Connected to MongoDB.");
     })
 
