@@ -1,12 +1,20 @@
-module.exports.home = function (req, res, next) {
-    res.send("Welcome to DressStore Application");
-}
 let procModel = require('../models/product');
+
+
+module.exports.home = function (req, res, next) {
+    res.json({
+        success: true,
+        message: "Welcome to DressStore Application"
+    }
+    );
+}
+
 //let procModel = require('../models/category');
 
 //add product
 module.exports.addNew = async function (req, res, next) {
     try {
+
         let newItem = new procModel(req.body);
         let result = await procModel.create(newItem);
         console.log(result);
@@ -38,8 +46,9 @@ module.exports.getProduct = async function (req, res, next) {
 //get by Id
 module.exports.getProductById = async function (req, res, next) {
     try {
-        let productId = req.params.id;
-        req.user = await procModel.findByid(id);
+        let id = req.params.itemId;
+        let item = await procModel.findById(id);
+        res.json(item)
         next();
     } catch (error) {
         console.log(error);
@@ -55,11 +64,11 @@ module.exports.read = async function (req, res, next) {
 //update product
 module.exports.updateProduct = async (req, res, next) => {
     try {
-        let itemid = req.params.id;
+        let newId = req.params.itemId;
         let updatedId= procModel(req.body);
-        updatedId._id = itemid;
+        updatedId._id = newId;
 
-        let result = await procModel.updateOne({ _id: itemid }, updatedid);
+        let result = await procModel.updateOne({ _id: newId }, updatedId);
         console.log(result);
         if (result.modifiedCount > 0) {
             res.json(
@@ -82,22 +91,15 @@ module.exports.updateProduct = async (req, res, next) => {
 //remove product
 module.exports.removeProduct = async (req, res, next) => {
     try {
-        let itemid = req.params.id;
-
-        let result = await procModel.deleteOne({ _id: itemid });
-
-        //console.log(result);
-        if (result.deletedCount > 0) {
-            res.json(
-                {
-                    success: true,
-                    message: "Item deleted successfully."
-                }
-            );
+        let newId = req.params.itemId;
+        let result = await procModel.findByIdAndDelete(newId);
+        if (!result) { throw new Error('Item not deleted. Are you sure it exists?')
         }
         else {
             // Express will catch this on its own.
-            throw new Error('Item not deleted. Are you sure it exists?')
+            res.json(
+                {success: true, message: "Item deleted successfully."}
+            );
         }
     } catch (error) {
         console.log(error);
